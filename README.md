@@ -31,4 +31,5 @@ jobs:
           version: ${{ github.event.inputs.version }}
           message: ${{ github.event.inputs.message }}
           token: ${{ secrets.GITHUB_TOKEN }}
+          require-semver: true
 ```

@@ -2,14 +2,24 @@ import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as semver from 'semver'
 
+function parseBool(value: any) {
+  try {
+    const parsed = JSON.parse(value)
+    if (typeof parsed == 'boolean') return parsed
+  } catch {}
+}
+
 async function run(): Promise<void> {
   try {
     const tag = core.getInput('version')
-    if (semver.valid(tag) == null) {
-      core.setFailed(
-        `Tag ${tag} does not appear to be a valid semantic version`
-      )
-      return
+    const requireSemver = parseBool(core.getInput('require-semver'))
+    if (requireSemver) {
+      if (semver.valid(tag) == null) {
+        core.setFailed(
+          `Tag ${tag} does not appear to be a valid semantic version`
+        )
+        return
+      }
     }
 
     const client = github.getOctokit(core.getInput('token'))

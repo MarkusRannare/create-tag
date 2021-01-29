@@ -1832,13 +1832,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(186));
 const github = __importStar(__webpack_require__(438));
 const semver = __importStar(__webpack_require__(383));
+function parseBool(value) {
+    try {
+        const parsed = JSON.parse(value);
+        if (typeof parsed == 'boolean')
+            return parsed;
+    }
+    catch (_a) { }
+}
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const tag = core.getInput('version');
-            if (semver.valid(tag) == null) {
-                core.setFailed(`Tag ${tag} does not appear to be a valid semantic version`);
-                return;
+            const requireSemver = parseBool(core.getInput('require-semver'));
+            if (requireSemver) {
+                if (semver.valid(tag) == null) {
+                    core.setFailed(`Tag ${tag} does not appear to be a valid semantic version`);
+                    return;
+                }
             }
             const client = github.getOctokit(core.getInput('token'));
             const tag_rsp = yield client.git.createTag(Object.assign(Object.assign({}, github.context.repo), { tag, message: core.getInput('message'), object: github.context.sha, type: 'commit' }));
